@@ -1,12 +1,15 @@
 'use client'
 import { useState } from "react";
-import { AiOutlinePlus, AiOutlineHome, AiOutlineSearch } from "react-icons/ai";
-import AddNovel from "./AddNovel";
+import { AiOutlinePlus, AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineUserAdd } from "react-icons/ai";
+import AddNovel from "./FormNovel";
 import { ADD_NOVEL } from "@/graphql/client/mutations";
 import { useMutation } from "@apollo/client";
+import Link from "next/link";
+import FormAuthor from "./FormAuthor";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [formAuthor, setFormAuthor] = useState(false);
 
   return (
     <>
@@ -86,19 +89,33 @@ const Sidebar = () => {
           </a>
 
           <nav data-dev-hint="main navigation">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="flex items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
             >
               <AiOutlineHome />
               <span>Home</span>
-            </a>
+            </Link>
             <button
               onClick ={() => setIsOpen(true)}
-              className="flex items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
+              className="flex w-full items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
             >
               <AiOutlinePlus />
-              <span>Create</span>
+              <span>Create Novel</span>
+            </button>
+            <Link
+              href="/authors"
+              className="flex items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
+            >
+              <AiOutlineTeam />
+              <span>Authors</span>
+            </Link>
+            <button
+              onClick ={() => setFormAuthor(true)}
+              className="flex  w-full items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
+            >
+              <AiOutlineUserAdd />
+              <span>Create Author</span>
             </button>
 
             <form className="w-10/12">
@@ -130,7 +147,7 @@ const Sidebar = () => {
                   type="search"
                   id="default-search"
                   className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Search Mockups, Logos..."
+                  placeholder="novel,author..."
                   required
                 />
               </div>
@@ -161,6 +178,10 @@ const Sidebar = () => {
       <AddNovel
         isOpen ={isOpen}
         closeModal = {() => setIsOpen(false)}
+      />
+      <FormAuthor
+       isOpen ={formAuthor}
+       closeModal ={ () => setFormAuthor(false)}
       />
     </>
   );

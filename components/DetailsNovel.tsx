@@ -1,11 +1,19 @@
 "use client";
-import { ADD_NOVEL } from "@/graphql/client/mutations";
-import { GET_NOVELS } from "@/graphql/client/queries";
+import { ADD_NOVEL, DELETE_NOVEL, UNSSIGN_AUTHOR_TO_NOVEL } from "@/graphql/client/mutations";
+import { GET_NOVEL, GET_NOVELS } from "@/graphql/client/queries";
 import { INovel } from "@/types/typings";
 import { useMutation } from "@apollo/client";
 import { Dialog, Transition } from "@headlessui/react";
 import { FormEvent, Fragment, useState } from "react";
 import Image from "next/image";
+import {
+  AiOutlineClose,
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineUserAdd,
+} from "react-icons/ai";
+import { useRouter } from "next/navigation";
+import AddNovel from "./FormNovel";
 
 interface DetailsNovelProps {
   isOpen: boolean;
@@ -18,19 +26,25 @@ export default function DetailsNovel({
   closeModal,
   novel,
 }: DetailsNovelProps) {
-  const [addNovel] = useMutation(ADD_NOVEL, {
+  const router = useRouter();
+  const [deleteNovel] = useMutation(DELETE_NOVEL, {
     refetchQueries: [{ query: GET_NOVELS }],
   });
-  const [title, setTitle] = useState("Exemple title");
-  const [image, setImage] = useState(
-    "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRM0mrm-yYO76LWixHapHYLeECDh8dZzd29pAqQ3AhCW8qCdxdO"
-  );
-
-  const hadnleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const [unssignAuthorToNovel] = useMutation(UNSSIGN_AUTHOR_TO_NOVEL, {
+    refetchQueries: [{ query: GET_NOVELS }],
+  })
+    const [editOpen, setEditOpen] = useState(false);
+  const hadnleSubmit = (e: FormEvent<HTMLFormElement>, id: string) => {
     e.preventDefault();
-    if (title === "" || image === "")
-      return alert("element it's be required all");
-    addNovel({ variables: { title, image } });
+  };
+
+  const handleDelete = (id: string) => {
+    deleteNovel({ variables: { deleteNovelId: id } });
+    router.push("/");
+  };
+  const handleUnssignAuthor = (id:any) => {
+    console.log('id: ', id);
+    unssignAuthorToNovel({variables: {relationId: id}});;
   };
 
   return (
@@ -65,7 +79,26 @@ export default function DetailsNovel({
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Details Novel
+                    <div className="flex flex-wrap gap-5 items-center">
+                      <button
+                        className="text-red-600"
+                        onClick={() => handleDelete(novel?.id)}
+                      >
+                        <AiOutlineDelete />
+                      </button>
+                      <button
+                        className="text-cyan-400"
+                        onClick={() => setEditOpen(true)}
+                      >
+                        <AiOutlineEdit />
+                      </button>
+                      <button
+                        className="text-emerald-500"
+                        onClick={closeModal}
+                      >
+                        <AiOutlineClose />
+                      </button>
+                    </div>
                   </Dialog.Title>
                   <div className="mt-1">
                     <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
@@ -80,20 +113,29 @@ export default function DetailsNovel({
                         </div>
                         <div className="p-8">
                           <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-                          {novel.title}
+                            {novel.title}
                           </div>
-                          <div
-                            className="block mt-1 text-lg leading-tight font-medium text-black hover:underline"
-                          >
-                            Author:
-                            {novel?.author?.map((item) =>(
-                              <p className="mt-2 text-slate-500">{item.name}</p>
-                            ))}
+                          <div className="block mt-1 text-lg leading-tight font-medium text-black ">
+                            <div className="flex flex-wrap">
+                              Author:
+                              {novel?.authors?.map((item) => (
+                                <span
+                                  key={item?.id}
+                                  className="flex text-gray-500 dark:text-gray-400 px-2"
+                                >
+                                  {item?.author?.name}
+                                  <button
+                                    className="text-red-600"
+                                    onClick={() => handleUnssignAuthor(item.id)}
+                                  >
+                                    <AiOutlineDelete />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
                           </div>
                           <p className="mt-2 text-slate-500">
-                            Looking to take your team away on a retreat to enjoy
-                            awesome food and take in some sunshine? We have a
-                            list of places to do just that.
+                            {novel?.desccription}
                           </p>
                         </div>
                       </div>
@@ -105,6 +147,12 @@ export default function DetailsNovel({
           </div>
         </Dialog>
       </Transition>
+      <AddNovel
+        isOpen={editOpen}
+        closeModal={() => setEditOpen(false)}
+        novel={novel}
+        action="edit"
+      />
     </>
   );
 }

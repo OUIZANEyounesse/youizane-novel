@@ -1,26 +1,61 @@
 'use client'
-import { ADD_NOVEL } from "@/graphql/client/mutations";
-import { GET_NOVELS } from "@/graphql/client/queries";
+import { ADD_NOVEL, ASSIGN_AUTHOR_TO_NOVEL, UPDATE_NOVEL } from "@/graphql/client/mutations";
+import { GET_NOVEL, GET_NOVELS } from "@/graphql/client/queries";
+import { IAuthor, INovel } from "@/types/typings";
 import { useMutation } from "@apollo/client";
 import { Dialog, Transition } from "@headlessui/react";
-import { FormEvent, Fragment, useState } from "react";
+import { FormEvent, Fragment, useEffect, useState } from "react";
+import ListAuthor from "./ListAuthor";
+import { useRouter } from 'next/navigation';
 
-interface AddNovelProps {
+interface FormNovelProps {
   isOpen: boolean;
   closeModal: () => void;
+  action?: "create"| "edit"
+  novel?: INovel
 }
 
-export default function AddNovel({ isOpen, closeModal }: AddNovelProps) {
+export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovelProps) {
   const [addNovel] = useMutation(ADD_NOVEL, {
 		refetchQueries: [{ query: GET_NOVELS }]});
-  const [title , setTitle ] = useState("Exemple title");
-  const [image , setImage ] = useState("https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRM0mrm-yYO76LWixHapHYLeECDh8dZzd29pAqQ3AhCW8qCdxdO");
+    const [updateNovel] = useMutation(UPDATE_NOVEL, {
+      refetchQueries: [{ query: GET_NOVELS }]});
+      const [assignAuthorToNovel] = useMutation(ASSIGN_AUTHOR_TO_NOVEL);
+  const [title , setTitle ] = useState("");
+  const [image , setImage ] = useState("");
+  const [desccription , setDesccription ] = useState("");
+  const [selectedAuthor, setSelectedAuthor] =  useState([]);
+  const router = useRouter();
 
   const hadnleSubmit = (e: FormEvent<HTMLFormElement>) =>{
     e.preventDefault();
-    if(title === "" || image === "") return alert("element it's be required all")
-    addNovel({variables:{title, image}})
+    if(title === "" || image === "" || desccription ==="") return alert("element it's be required all")
+    if(action === "edit"){
+       updateNovel({variables:{updateNovelId:novel?.id,title, image,desccription}})
+
+      if(selectedAuthor?.length > 0){
+        selectedAuthor?.map((author:IAuthor) => 
+        assignAuthorToNovel({variables: {authorId: author?.id, novelId:novel?.id }}) 
+        )
+        
+      }
+    }else{
+
+      // @ts-ignore
+      const novelId =  addNovel({variables:{title, image,desccription,authorId:selectedAuthor.id}})
+      router.push('/');
+    }
   }
+  useEffect(()=>{
+
+    setTitle(novel?.title || "");
+    setImage(novel?.image || "");
+    setDesccription(novel?.desccription || "");
+    let authors:IAuthor[] = novel?.authors?.map((item) => item.author) || [];
+    // @ts-ignore
+    setSelectedAuthor(authors);
+  },[novel])
+
 
   return (
     <>
@@ -39,7 +74,7 @@ export default function AddNovel({ isOpen, closeModal }: AddNovelProps) {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <div className="flex items-center justify-center min-h-full p-4 text-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -49,12 +84,13 @@ export default function AddNovel({ isOpen, closeModal }: AddNovelProps) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Add New Novel
+                    
+                    {action === "edit"? "Update Novel":"Add New Novel"}
                   </Dialog.Title>
                   <div className="mt-4">
                     <form 
@@ -66,6 +102,7 @@ export default function AddNovel({ isOpen, closeModal }: AddNovelProps) {
                           className="block mb-2 text-sm font-medium text-gray-90"
                         >
                           Title 
+
                         </label>
                         <input
                           type="text"
@@ -92,14 +129,42 @@ export default function AddNovel({ isOpen, closeModal }: AddNovelProps) {
                           value={image}
                         />
                       </div>
+                      <div className="mb-6">
+                        <label
+                          htmlFor="desccription"
+                          className="block mb-2 text-sm font-medium text-gray-900"
+                        >
+                          Description
+                        </label>
+                        <textarea
+                          id="desccription"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="https://youizane.com/image"
+                          required
+                          onChange={(e) => setDesccription(e.target.value)}
+                        >{desccription}</textarea>
+                      </div>
+                      <div className="mb-6">
+                            <label
+                              htmlFor="author"
+                              className="block mb-2 text-sm font-medium text-gray-90"
+                            >
+                              Author 
+                            </label>
+                            <ListAuthor
+                              selected={selectedAuthor}
+                              setSelected={setSelectedAuthor}
+                              action ={action}
+                            />
+                          </div>
                       <button
                         type="submit"
                         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         onClick ={closeModal}
                       >
-                        New Novel
+                        {action === "edit" ? "Update Novel": "Create Novel"}
                       </button>
                     </form>
+                  
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

@@ -20,14 +20,14 @@ const [isOpen, setIsOpen] = useState(false);
           {novel.title}
         </h5>
        
-        <div className="flex items-center mt-2.5 mb-5">
-          <dd className="text-gray-500 dark:text-gray-400">Author:</dd>
+        <div className="flex flex-wrap items-center mt-2.5 mb-5">
+          <span className="flex text-gray-500 dark:text-gray-400">Author:</span>
           
-          {novel?.author?.map((item) => (
+          {novel?.authors?.map((item) => (
 
-          <dt key={item?.id} className="text-gray-500 dark:text-gray-400 px-2">
-            {item.name}
-          </dt>
+          <span key={item?.id} className="flex text-gray-500 dark:text-gray-400 px-2">
+            {item?.author?.name}
+          </span>
           ))}
         </div>
         <div className="flex items-center justify-between">

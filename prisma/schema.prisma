@@ -14,14 +14,24 @@ model Novel {
   id       String   @id @default(uuid())
   title    String
   image    String?
+  desccription String
   createAt DateTime @default(now())  @db.Timestamptz(6)
   updateAt DateTime? @db.Timestamptz(6)
-  author   Author[]
+  authors   NovelOnAuthor[]
 }
 
 model Author {
   id      String  @id @default(uuid())
   name    String
-  Novel   Novel?  @relation(fields: [novelId], references: [id])
-  novelId String?
+  novels NovelOnAuthor[]
+}
+
+
+model NovelOnAuthor {
+  id      String  @id @default(uuid())
+  novel Novel @relation(fields: [novelId], references: [id])
+  novelId String
+  author Author @relation(fields: [authorId], references: [id])
+  authorId String
+  assignedAt DateTime @default(now())  
 }
