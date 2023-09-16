@@ -4,7 +4,7 @@ import { GET_AUTHORS } from "@/graphql/client/queries";
 import { IAuthor } from "@/types/typings";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import FormAuthor from "./FormAuthor";
 import { useState } from "react";
 

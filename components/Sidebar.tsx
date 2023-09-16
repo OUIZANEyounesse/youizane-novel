@@ -1,15 +1,15 @@
 'use client'
 import { useState } from "react";
-import { AiOutlinePlus, AiOutlineHome, AiOutlineSearch, AiOutlineTeam, AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlinePlus, AiOutlineHome, AiOutlineTeam, AiOutlineUserAdd } from "react-icons/ai";
 import AddNovel from "./FormNovel";
-import { ADD_NOVEL } from "@/graphql/client/mutations";
-import { useMutation } from "@apollo/client";
 import Link from "next/link";
-import FormAuthor from "./FormAuthor";
+import { Button } from "antd";
+import FAuthor from './FAuthor';
+import FNovel from "./FNovel";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [formAuthor, setFormAuthor] = useState(false);
+  const [openIs, setOpenIs] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
@@ -97,7 +97,7 @@ const Sidebar = () => {
               <span>Home</span>
             </Link>
             <button
-              onClick ={() => setIsOpen(true)}
+              onClick ={() => setOpenIs(true)}
               className="flex w-full items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
             >
               <AiOutlinePlus />
@@ -111,8 +111,8 @@ const Sidebar = () => {
               <span>Authors</span>
             </Link>
             <button
-              onClick ={() => setFormAuthor(true)}
-              className="flex  w-full items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
+              onClick ={() => setIsModalOpen(true)}
+              className="flex w-full items-center space-x-2 py-2 px-4 transition duration-200 hover:bg-gray-700 hover:text-white"
             >
               <AiOutlineUserAdd />
               <span>Create Author</span>
@@ -175,13 +175,25 @@ const Sidebar = () => {
         </nav>
       </aside>
 
-      <AddNovel
-        isOpen ={isOpen}
-        closeModal = {() => setIsOpen(false)}
+      {/* <AddNovel
+        isOpen ={openIs}
+        closeModal = {() => setopenIs(false)}
+      /> */}
+      <FNovel
+        open ={openIs}
+        handleOk = {() => setOpenIs(false)}
+       handleCancel = {() => setOpenIs(false)}
       />
-      <FormAuthor
-       isOpen ={formAuthor}
+
+      {/* <FormAuthor
+       openIs ={formAuthor}
        closeModal ={ () => setFormAuthor(false)}
+      /> */}
+      <FAuthor
+       open ={isModalOpen}
+       handleOk = {() => setIsModalOpen(false)}
+       handleCancel = {() => setIsModalOpen(false)}
+
       />
     </>
   );

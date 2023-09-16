@@ -17,7 +17,7 @@ export default function ListAuthor({
   action,
 }: ListAuthorProps) {
   const { data } = useQuery(GET_AUTHORS);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState<string>("");
   const filteredAuthors =
     query === ""
       ? data?.authors
@@ -29,12 +29,10 @@ export default function ListAuthor({
         const handleChange = (value:string) =>{
           setQuery(value);
         }
-
-  console.log("query: ", query);
   return (
     <div className="w-full">
-     { (action === 'edit') ? 
-     <Combobox value={selected} onChange={setSelected} multiple  name="authors">
+     { (action === "edit") ? 
+     <Combobox value={selected} onChange={() => setSelected} multiple  name="authors">
      <div className="relative mt-1">
        <div className="relative w-full overflow-hidden text-left bg-white rounded-lg shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
          <Combobox.Input
@@ -74,7 +72,7 @@ export default function ListAuthor({
                  }
                  value={author}
                >
-                 {({ selected, active }) => (
+                 {({ selected, active }:{selected: IAuthor[], active:boolean}) => (
                    <>
                      <span
                        className={`block truncate ${
@@ -142,7 +140,7 @@ export default function ListAuthor({
                     }
                     value={author}
                   >
-                    {({ selected, active }) => (
+                    {({ selected, active }:{selected: IAuthor[], active:boolean}) => (
                       <>
                         <span
                           className={`block truncate ${

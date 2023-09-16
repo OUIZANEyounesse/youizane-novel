@@ -17,7 +17,7 @@ type FormAuthorProps ={
 const FormAuthors = ({isOpen, closeModal,action,author}:FormAuthorProps) =>{
   const router = useRouter();
   const [addAuthor] = useMutation(ADD_AUTHOR);
-  const [updateAuthor] = useMutation(UPDATE_AUTHOR,{refetchQueries:{query: GET_AUTHORS}});
+  const [updateAuthor] = useMutation(UPDATE_AUTHOR,{refetchQueries:[{query: GET_AUTHORS}]});
     const hadnleSubmit = (e: FormEvent<HTMLFormElement>) =>{
       e.preventDefault();
       if(name === "" ) return alert("element it's be required all")
@@ -29,7 +29,7 @@ const FormAuthors = ({isOpen, closeModal,action,author}:FormAuthorProps) =>{
         router.push('/authors');
       }
     }
-    const [name, setName] = useState("");
+    const [name, setName] = useState<string>("");
     useEffect(()=>{
       setName(author?.name || "");
     },[author])
@@ -69,7 +69,7 @@ const FormAuthors = ({isOpen, closeModal,action,author}:FormAuthorProps) =>{
                       </Dialog.Title>
                       <div className="mt-4">
                         <form 
-                        onSubmit={hadnleSubmit}
+                        onSubmit={()  => hadnleSubmit}
                         >
                           <div className="mb-6">
                             <label

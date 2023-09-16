@@ -1,3 +1,4 @@
+'use client'
 import { INovel } from "@/types/typings";
 import Image from "next/image";
 import { useState } from "react";
@@ -9,7 +10,7 @@ const [isOpen, setIsOpen] = useState(false);
       <div className="flex items-center justify-center">
         <Image
           className="p-8 rounded-t-lg"
-          src={novel.image || ""}
+          src={novel?.image || ""}
           alt="product image"
           width={183}
           height={30}
@@ -17,7 +18,7 @@ const [isOpen, setIsOpen] = useState(false);
       </div>
       <div className="px-5 pb-5">
         <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
-          {novel.title}
+          {novel?.title}
         </h5>
        
         <div className="flex flex-wrap items-center mt-2.5 mb-5">

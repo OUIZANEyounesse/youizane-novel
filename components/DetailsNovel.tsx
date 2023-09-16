@@ -1,21 +1,19 @@
-"use client";
-import { ADD_NOVEL, DELETE_NOVEL, UNSSIGN_AUTHOR_TO_NOVEL } from "@/graphql/client/mutations";
-import { GET_NOVEL, GET_NOVELS } from "@/graphql/client/queries";
+'use client';
+import {
+  DELETE_NOVEL,
+  UNSSIGN_AUTHOR_TO_NOVEL,
+} from "@/graphql/client/mutations";
+import { GET_NOVELS } from "@/graphql/client/queries";
 import { INovel } from "@/types/typings";
 import { useMutation } from "@apollo/client";
 import { Dialog, Transition } from "@headlessui/react";
-import { FormEvent, Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 import Image from "next/image";
-import {
-  AiOutlineClose,
-  AiOutlineDelete,
-  AiOutlineEdit,
-  AiOutlineUserAdd,
-} from "react-icons/ai";
+import { AiOutlineClose, AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import AddNovel from "./FormNovel";
 
-interface DetailsNovelProps {
+type DetailsNovelProps = {
   isOpen: boolean;
   closeModal: () => void;
   novel: INovel;
@@ -32,25 +30,27 @@ export default function DetailsNovel({
   });
   const [unssignAuthorToNovel] = useMutation(UNSSIGN_AUTHOR_TO_NOVEL, {
     refetchQueries: [{ query: GET_NOVELS }],
-  })
-    const [editOpen, setEditOpen] = useState(false);
-  const hadnleSubmit = (e: FormEvent<HTMLFormElement>, id: string) => {
-    e.preventDefault();
-  };
+  });
+  const [editOpen, setEditOpen] = useState(false);
 
   const handleDelete = (id: string) => {
-    deleteNovel({ variables: { deleteNovelId: id } });
-    router.push("/");
+    if (typeof(id) === 'string') {
+      deleteNovel({ variables: { deleteNovelId: id } });
+      router.push("/");
+    }
   };
-  const handleUnssignAuthor = (id:any) => {
-    console.log('id: ', id);
-    unssignAuthorToNovel({variables: {relationId: id}});;
+  const handleUnssignAuthor = (id: string) => {
+    if (typeof(id) === 'string') {
+      unssignAuthorToNovel({ variables: { relationId: id } });
+    }
   };
+
+  if(novel === null ) return ;
 
   return (
     <>
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className=" relative z-10 " onClose={closeModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -76,13 +76,13 @@ export default function DetailsNovel({
               >
                 <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
+                    as='h3'
+                    className='text-lg font-medium leading-6 text-gray-900'
                   >
                     <div className="flex flex-wrap gap-5 items-center">
                       <button
                         className="text-red-600"
-                        onClick={() => handleDelete(novel?.id)}
+                        onClick={() => handleDelete(novel.id)}
                       >
                         <AiOutlineDelete />
                       </button>
@@ -92,10 +92,7 @@ export default function DetailsNovel({
                       >
                         <AiOutlineEdit />
                       </button>
-                      <button
-                        className="text-emerald-500"
-                        onClick={closeModal}
-                      >
+                      <button className="text-emerald-500" onClick={closeModal}>
                         <AiOutlineClose />
                       </button>
                     </div>
@@ -105,8 +102,8 @@ export default function DetailsNovel({
                       <div className="md:flex">
                         <div className="md:shrink-0">
                           <Image
-                            src={novel?.image || ""}
-                            alt={novel.title}
+                            src={novel.image || ""}
+                            alt={novel.title || ""}
                             width={170}
                             height={40}
                           />
@@ -120,10 +117,10 @@ export default function DetailsNovel({
                               Author:
                               {novel?.authors?.map((item) => (
                                 <span
-                                  key={item?.id}
+                                  key={item.id}
                                   className="flex text-gray-500 dark:text-gray-400 px-2"
                                 >
-                                  {item?.author?.name}
+                                  {item.author.name}
                                   <button
                                     className="text-red-600"
                                     onClick={() => handleUnssignAuthor(item.id)}
@@ -135,7 +132,7 @@ export default function DetailsNovel({
                             </div>
                           </div>
                           <p className="mt-2 text-slate-500">
-                            {novel?.desccription}
+                            {novel.desccription}
                           </p>
                         </div>
                       </div>

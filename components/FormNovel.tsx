@@ -1,6 +1,6 @@
 'use client'
 import { ADD_NOVEL, ASSIGN_AUTHOR_TO_NOVEL, UPDATE_NOVEL } from "@/graphql/client/mutations";
-import { GET_NOVEL, GET_NOVELS } from "@/graphql/client/queries";
+import {  GET_NOVELS } from "@/graphql/client/queries";
 import { IAuthor, INovel } from "@/types/typings";
 import { useMutation } from "@apollo/client";
 import { Dialog, Transition } from "@headlessui/react";
@@ -21,19 +21,21 @@ export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovel
     const [updateNovel] = useMutation(UPDATE_NOVEL, {
       refetchQueries: [{ query: GET_NOVELS }]});
       const [assignAuthorToNovel] = useMutation(ASSIGN_AUTHOR_TO_NOVEL);
-  const [title , setTitle ] = useState("");
-  const [image , setImage ] = useState("");
-  const [desccription , setDesccription ] = useState("");
-  const [selectedAuthor, setSelectedAuthor] =  useState([]);
+  const [title , setTitle ] = useState<string>("");
+  const [image , setImage ] = useState<string>("");
+  const [desccription , setDesccription ] = useState<string>("");
+  const [selectedAuthor, setSelectedAuthor] =  useState<IAuthor[]>([]);
   const router = useRouter();
 
   const hadnleSubmit = (e: FormEvent<HTMLFormElement>) =>{
     e.preventDefault();
-    if(title === "" || image === "" || desccription ==="") return alert("element it's be required all")
-    if(action === "edit"){
+    if (title === "" || image === "" || desccription === "") {
+      alert("All elements are required.");
+    }
+    if(action !== null && action === "edit" && novel !== null ){
        updateNovel({variables:{updateNovelId:novel?.id,title, image,desccription}})
 
-      if(selectedAuthor?.length > 0){
+      if( selectedAuthor?.length > 0 && novel !== null){
         selectedAuthor?.map((author:IAuthor) => 
         assignAuthorToNovel({variables: {authorId: author?.id, novelId:novel?.id }}) 
         )
@@ -42,7 +44,7 @@ export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovel
     }else{
 
       // @ts-ignore
-      const novelId =  addNovel({variables:{title, image,desccription,authorId:selectedAuthor.id}})
+      addNovel({variables:{title, image,desccription,authorId:selectedAuthor[0]?.id}})
       router.push('/');
     }
   }
@@ -53,14 +55,14 @@ export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovel
     setDesccription(novel?.desccription || "");
     let authors:IAuthor[] = novel?.authors?.map((item) => item.author) || [];
     // @ts-ignore
-    setSelectedAuthor(authors);
+    setSelectedAuthor<IAuthor[]>(authors);
   },[novel])
 
 
   return (
-    <>
+    <div>
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className='relative z-10' onClose={closeModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -90,7 +92,7 @@ export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovel
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
                     
-                    {action === "edit"? "Update Novel":"Add New Novel"}
+                    {action === "edit" ? "Update Novel":"Add New Novel"}
                   </Dialog.Title>
                   <div className="mt-4">
                     <form 
@@ -152,7 +154,7 @@ export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovel
                             </label>
                             <ListAuthor
                               selected={selectedAuthor}
-                              setSelected={setSelectedAuthor}
+                              setSelected={() => setSelectedAuthor}
                               action ={action}
                             />
                           </div>
@@ -172,6 +174,6 @@ export default function FormNovel({ isOpen, closeModal,action,novel }: FormNovel
           </div>
         </Dialog>
       </Transition>
-    </>
+    </div>
   );
 }

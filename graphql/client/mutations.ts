@@ -14,7 +14,7 @@ mutation AddNovel($image: String, $title: String,$desccription:String,$authorId:
 `;
 
 export const DELETE_NOVEL = gql`
-mutation DeleteNovel($deleteNovelId: ID) {
+mutation DeleteNovel($deleteNovelId: String) {
   deleteNovel(id: $deleteNovelId) {
     id
     title
@@ -27,7 +27,7 @@ mutation DeleteNovel($deleteNovelId: ID) {
 `;
 
 export const UPDATE_NOVEL = gql`
-mutation UpdateNovel($updateNovelId: ID, $image: String, $title: String, $desccription: String) {
+mutation UpdateNovel($updateNovelId: String, $image: String, $title: String, $desccription: String) {
   updateNovel(id: $updateNovelId, image: $image, title: $title, desccription: $desccription) {
     id
     title
@@ -48,7 +48,7 @@ mutation AddAuthor($name: String) {
 }`;
 
 export const DELETE_AUTHOR = gql`
-mutation DeleteAuthor($deleteAuthorId: ID) {
+mutation DeleteAuthor($deleteAuthorId: String) {
   deleteAuthor(id: $deleteAuthorId) {
     id
     name
@@ -57,7 +57,7 @@ mutation DeleteAuthor($deleteAuthorId: ID) {
 `;
 
 export const UPDATE_AUTHOR = gql`
-mutation UpdateAuthor($updateAuthorId: ID, $name: String) {
+mutation UpdateAuthor($updateAuthorId: String, $name: String) {
   updateAuthor(id: $updateAuthorId, name: $name) {
     id
     name
